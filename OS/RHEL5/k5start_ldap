@@ -1,0 +1,134 @@
+#!/bin/bash
+##############################################################################
+# k5start_ldap:	Keeps Kerberos 5 /etc/.ldapcache ticket active
+# Author:	Mark R. Bannister <cambridge@users.sourceforge.net>
+# Modified By:   Aaron Wyllie <aaron.t.wyllie@gmail.com>
+#
+# chkconfig: 345 20 75
+# description:  Keeps Kerberos 5 /etc/.ldapcache ticket active
+#
+# processname: /usr/bin/k5start_ldap
+# config: /etc/krb5.confk
+# pidfile: /var/run/k5start_ldap.pid
+##############################################################################
+# k5start_ldap init script
+# Copyright (c) 2011 Mark R. Bannister <cambridge@users.sourceforge.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
+
+# Sanity checks.
+[ -f /etc/krb5.conf ] || exit 0
+[ -x /usr/bin/k5start ] || exit 0
+
+# Source function library.
+. /etc/init.d/functions
+
+K5START_KEYTAB=/etc/krb5.keytab
+K5START_MINUTES=30
+K5START_OPTIONS="-u `echo ${HOSTNAME%%.*}`\$"
+
+# Get hostname and FQDN
+
+#if [ $# -ne 1 ]; then
+#  hostfqdn=`hostname -f`
+#else
+#  hostfqdn=$1
+#fi
+#computername=${hostfqdn%%.*}
+#if [ $hostfqdn == $computername ]; then
+#  hostfqdn=$computername.`hostname -d`
+#fi
+
+# Source an auxiliary options file if we have one
+# This can override K5START_KEYTAB, K5START_MINUTES and K5START_OPTIONS
+# It can also set DAEMON_COREFILE_LIMIT and NICELEVEL
+[ -r /etc/sysconfig/k5start_ldap ] && . /etc/sysconfig/k5start_ldap
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting k5start_ldap: "
+
+    #
+    # Use KINIT_PROG and the -t option to keep /etc/.ldapcache file always
+    # readable by everyone (otherwise nss_ldap will hang if it is configured
+    # to use this Kerberos ticket cache)
+    #
+    # Also running 'getent passwd' will serve two purposes:
+    #	1. Pre-populate ticket cache with a ticket
+    #		(user processes can't write to this file, so without this
+    #		there will be a Kerberos ticket request every time nss_ldap
+    #		needs some information from the directory)
+    #	2. As a useful side-effect, nscd will be pre-populated
+    #
+    export KINIT_PROG="chmod 644 /etc/.ldapcache && getent passwd > /dev/null"
+    daemon --pidfile /var/run/k5start_ldap.pid \
+		/usr/bin/k5start -f $K5START_KEYTAB -bLtK$K5START_MINUTES \
+			-p /var/run/k5start_ldap.pid -k /etc/.ldapcache \
+			$K5START_OPTIONS 
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/k5start_ldap
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping k5start_ldap: "
+    killproc -p /var/run/k5start_ldap.pid k5start
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/k5start_ldap
+    echo
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+}
+
+# See how we were called.
+case "$1" in
+    start)
+	start
+	RETVAL=$?
+	;;
+    stop)
+	stop
+	RETVAL=$?
+	;;
+    status)
+	status -p /var/run/k5start_ldap.pid k5start
+	RETVAL=$?
+	;;
+    restart)
+	restart
+	RETVAL=$?
+	;;
+    try-restart | condrestart)
+	[ -e /var/lock/subsys/k5start_ldap ] && restart
+	RETVAL=$?
+	;;
+    force-reload | reload)
+    	echo -n $"Refreshing k5start_ldap ticket cache: "
+	killproc -p /var/run/k5start_ldap.pid k5start -ALRM
+	RETVAL=$?
+	echo
+	;;
+    *)
+	echo $"Usage: $0 {start|stop|status|restart|reload|condrestart}"
+	RETVAL=1
+	;;
+esac
+exit $RETVAL
