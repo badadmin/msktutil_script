@@ -15,3 +15,6 @@ servers objects.  In other words, a Domain Administrator account.
 This script does *not* create new or modify existing users with the schema 
 attributes and values required to properly authenticate from the Linux server 
 to Active Directory.
+
+running msktutil_core
+================
