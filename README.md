@@ -60,8 +60,10 @@ advantages and disadvantages.  Part of goal in pulling all of this together
 and in writing this stupid long bash script was to overcome the problems we 
 faced at work with a poorly implemented Samba solution.  Please note that I 
 said *poorly implemented solution * and not that Samba itself was poorly 
-implemented.  TL;DR - Samba had to go and this scripts will uninstall it by 
-default unless you make some changes.  Don't take it personally.
+implemented.  The solution was lacking insofar as the person implementing it 
+was not concerned with how the Active Directory-side of things worked or, oddly
+enough, how things like NTP work.  TL;DR - Samba had to go and this scripts 
+will uninstall it by default unless you make some changes.  Don't take it personally.
 
 I also have a strong LDAP and Active Directory background and it 
 just so happens that we could *not* stand-up an OpenLDAP server and create a 
@@ -85,7 +87,11 @@ that matter to you in Active Directory ... :
 
 ... please see my blog post if you'd like more information ... :
 
-    http://lesserhero.blogspot.com/2012/09/rhel-5-active-directory-and-kerberos.html
+[Configuring Red Hat Enterprise Linux (RHEL) 5 To Authenticate Against LDAP (Microsoft Windows Active Directory 2008 R2) Using Kerberos 5](http://lesserhero.blogspot.com/2012/09/rhel-5-active-directory-and-kerberos.html)
+
+... in fact, that blog post is non-automated version of this process.  Please 
+note, however, that it has not been updated in some time and I have learned a 
+few new things about this process while trying to automate it somewhat.
 
 The driver behind this is [msktutil](http://code.google.com/p/msktutil/); if 
 you aren't familiar; become so.  It's an outstanding tool.
@@ -96,7 +102,19 @@ Again, a good place to start if you are unfamiliar.
 goals
 ================
 
-
+* Computer Domain Membership
+** Join RHEL 5 server (or RHEL 5 clone) to Active Directory domain from the command-line of the Linux server.
+** Auto-acquire and populate Kerberos key from Active Directory and from the command-line of the Linux server.
+** Allow the computer to automatically change it's password every 30 days (possible only if NFSv4 is **not** being used ... see notes further down)
+* Authentication to LDAP
+** Console Login
+** SSH\SFTP Login
+** HTTP\FTP Login (not implemented yet)
+* Authorized Password Changes
+** Force user to change their passowrd at their initial login or after a password has been reset in Active Directory.
+** Notify user when their password is approaching expiry or has already expired.
+** Honor password policies as set in Active Directory GPO password policies (some of these work, like number of days before user can change password again.  Others, like the password complexity requirements get hung-up on RHEL' password complexity rules and need to be disabled locally to be circumvented).
+** Account lock-out per Active Directory policy (lock-out on LDAP server; locked out on domain).
 
 running msktutil_core
 ================
