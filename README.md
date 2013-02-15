@@ -37,7 +37,7 @@ about
 ================
 
 These scripts grew out of my frustration at the lack of a concise 
-solution to join Linux and AIX servers to a Windows 2003 RC2 or 200 R2 Active 
+solution to join Linux and AIX servers to a Windows 2003 RC2 or 2008 R2 Active 
 Directory domain using native-ish tools.  There are lots of resources online 
 and off that kinda sorta maybe do this.  But they are always incomplete.  This 
 is my attempt to pull together a lot of different ideas and make them all work.
@@ -47,7 +47,7 @@ or krb5-ticket-renew.sh.  Changed one just a little but that's it.  Also, other
 sources had different goals and I embraced them.  All lot of the ideas and 
 direction came from this post and it's follow-ups by Mark R. Bannister:
 
-    http://technicalprose.blogspot.com/2011/10/linux-integration-with-active-directory.html
+[Technical Prose - Linux Integration with Active Directory - Part 1](http://technicalprose.blogspot.com/2011/10/linux-integration-with-active-directory.html)
 
 Yes, there are 3rd party solutions like Quest Authentication Services and 
 Centrify Active Directory Bridging and Centrify Express and BeyondTrust 
@@ -90,7 +90,7 @@ that matter to you in Active Directory ... :
 The driver behind this is [msktutil](http://code.google.com/p/msktutil/); if 
 you aren't familiar; become so.  It's an outstanding tool.
 
-The other tool being levergaed is [kstart](http://www.eyrie.org/~eagle/software/kstart/).
+The other tool being leveraged is [kstart](http://www.eyrie.org/~eagle/software/kstart/).
 Again, a good place to start if you are unfamiliar.
 
 goals
