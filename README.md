@@ -71,17 +71,32 @@ add to user objects on the Active Directory-side to make this work.  Don't
 worry; there are no schema changes happening.  All the fields that need to be 
 updated in Active Directory exist post-Windows 2003 RC2 and 2008 R2.
 
-The driver behind this is msktutil ... :
+**NOTE**:  I don't include any LDIF at this time for making bulk user modifications
+in Active Directory.  I might include them in the future.  Here are the values 
+that matter to you in Active Directory ... :
 
-    http://code.google.com/p/msktutil/
+* loginshell
+* gecos
+* gid
+* gidNumber
+* uid
+* uidNumber
+* unixHomeDirectory
 
-... if you aren't familiar; become so.  It's an outstanding tool.
+... please see my blog post if you'd like more information ... :
 
-The other tool being levergaed is kstart ... :
+    http://lesserhero.blogspot.com/2012/09/rhel-5-active-directory-and-kerberos.html
 
-    http://www.eyrie.org/~eagle/software/kstart/
+The driver behind this is [msktutil](http://code.google.com/p/msktutil/); if 
+you aren't familiar; become so.  It's an outstanding tool.
 
-... again, a good place to start if you are unfamiluar.
+The other tool being levergaed is [kstart](http://www.eyrie.org/~eagle/software/kstart/).
+Again, a good place to start if you are unfamiliar.
+
+goals
+================
+
+
 
 running msktutil_core
 ================
