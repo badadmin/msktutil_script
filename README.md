@@ -102,19 +102,21 @@ Again, a good place to start if you are unfamiliar.
 goals
 ================
 
-* Computer Domain Membership
-** Join RHEL 5 server (or RHEL 5 clone) to Active Directory domain from the command-line of the Linux server.
-** Auto-acquire and populate Kerberos key from Active Directory and from the command-line of the Linux server.
-** Allow the computer to automatically change it's password every 30 days (possible only if NFSv4 is **not** being used ... see notes further down)
-* Authentication to LDAP
-** Console Login
-** SSH\SFTP Login
-** HTTP\FTP Login (not implemented yet)
-* Authorized Password Changes
-** Force user to change their passowrd at their initial login or after a password has been reset in Active Directory.
-** Notify user when their password is approaching expiry or has already expired.
-** Honor password policies as set in Active Directory GPO password policies (some of these work, like number of days before user can change password again.  Others, like the password complexity requirements get hung-up on RHEL' password complexity rules and need to be disabled locally to be circumvented).
-** Account lock-out per Active Directory policy (lock-out on LDAP server; locked out on domain).
+*Computer Domain Membership*
+* Join RHEL 5 server (or RHEL 5 clone) to Active Directory domain from the command-line of the Linux server.
+* Auto-acquire and populate Kerberos key from Active Directory and from the command-line of the Linux server.
+* Allow the computer to automatically change it's password every 30 days (possible only if NFSv4 is **not** being used ... see notes further down)
+
+*Authentication to LDAP*
+* Console Login
+* SSH\SFTP Login
+* HTTP\FTP Login (not implemented yet)
+
+*Authorized Password Changes*
+* Force user to change their passowrd at their initial login or after a password has been reset in Active Directory.
+* Notify user when their password is approaching expiry or has already expired.
+* Honor password policies as set in Active Directory GPO password policies (some of these work, like number of days before user can change password again.  Others, like the password complexity requirements get hung-up on RHEL' password complexity rules and need to be disabled locally to be circumvented).
+* Account lock-out per Active Directory policy (lock-out on LDAP server; locked out on domain).
 
 running msktutil_core
 ================
