@@ -103,8 +103,11 @@ the ability be governed by the consumer' management of the /etc/sudoers file.  L
 * Force user to change their password at their initial login or after a password has been reset in Active Directory.
 * Notify user when their password is approaching expiry or has already expired.
 * Honor password policies as set in Active Directory GPO password policies (some of these work, like number of days before user can change password again.  Others, like the password complexity requirements get hung-up on RHEL' password complexity rules and need to be disabled locally to be circumvented).
-* Account lock-out per Active Directory policy (lock-out on LDAP server; locked out on domain).
+* Account lock-out per Active Directory policy (lock-out on LDAP server means locked out on domain).
 * Allow Active Directory password to be changed from Linux server.
+
+*Other Stuff*
+* The krb5-ticket-renew.sh script that gets set-up monitors the state you each user' Kerberos ticket and calls kinit to refresh it periodically.  This is the same kind of behavior that goes on behind the scenes when you are logged in to a Windows server.  Simple calling kinit as *user* doesn't require a password if the user has a currently valid Kerberos ticket.  It merely tells the Active Directory domain controller that *user* is still logged in and still needs their ticket.  This good because the alternative is that *user* needs to remember to do this themselves every few hours.  When the Kerberos ticket for *user* is truly about to expire, the script will prompt *user* to re-enter their Active Directory password via kinit.  It will also delete expired Kerberos tickets.
 
 todo
 ================
@@ -113,6 +116,7 @@ todo
 * Expand to cover RHEL 6 and Debian\Ubuntu.
 * Break script up to be more modular and add some menu functionality.
 * Add a restore process to revert as many changes as possible to allow roll-back.
+* Add Postfix or Sendmail configuration to allow emailed results and alerts.
 
 Please let me know how I can improve this.
 
