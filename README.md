@@ -38,7 +38,7 @@ Yes, there are 3rd party solutions like Quest Authentication Services and Centri
 PowerBroker Identity Services for Active Directory Bridging.  All of these have benefits and disadvantages.  With the exception of Centrify Express, cost is 
 the greatest.  I like free stuff.
 
-Samba is often touted as the *right tool for the job* but it, too, has its advantages and disadvantages.  Part of goal in pulling all of this together 
+Samba is often touted as the *right tool for the job* but it, too, has its advantages and disadvantages.  Part of the goal in pulling all of this together 
 and in writing this stupid long bash script was to overcome the problems we faced at work with a poorly implemented Samba solution.  Please note that I 
 said *poorly implemented solution * and not that Samba itself was poorly implemented.  The solution was lacking insofar as the person implementing it 
 was not concerned with how the Active Directory-side of things worked or, oddly enough, how things like NTP work.  TL;DR - Samba had to go and this scripts 
