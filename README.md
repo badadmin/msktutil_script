@@ -285,9 +285,9 @@ Active Directory LDAP query at **Step 37**.  That step will fail, too.  Just sta
 * The getent command expects that the HOST has a Kerberos ticket.  In other words, when k5start_ldap failed to start earlier, the HOST could not see passwd beyond the local /etc/passwd file even though /etc/nsswitch is configured to search both locally and LDAP.
 * The ldapsearch command, hwoever, **does** expect that user running has a Kerberos ticket that grants it the ability to query Active Directory.  In other words, unless root has a Kerberos ticket (by kinit'ng as an Active Directory user), then root will **not** be able to successfully run ldapsearcg even though the HOST has a valid Kerberos ticket.
 
-Other things you can check once it's complete:
+Other things you can check once it's complete ... :
 
-* /etc/krb5.keytab
+Verify the contents of /etc/krb5.keytab ... :
 
     [root@server01]# klist -ket
     Keytab name: FILE:/etc/krb5.keytab
@@ -309,7 +309,7 @@ Other things you can check once it's complete:
        2 02/15/13 20:43:14 host/server01@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
        2 02/15/13 20:43:14 host/server01@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC)
 
-* sudo
+Verify that sudo and /etc/sudoers work (you'll need to configure /etc/sudoers to you requirements, obviously) ... :
 
     [badadmin_ldap@server01]$ id
     uid=771234567(badadmin_ldap) gid=77001(UNIXGRP) groups=77001(UNIXGRP),77002(UNIXWHEEL)
@@ -317,7 +317,7 @@ Other things you can check once it's complete:
     [root@server01]# cat /etc/sudoers | grep UNIXWHEEL
     %UNIXWHEEL      ALL=(ALL)       NOPASSWD: ALL
 
-* password reset
+Confirm that require password change at first login work and that password change work in -general ... :
 
     Please enter login information for 192.168.0.50.
     Username: luxuser01
@@ -365,5 +365,9 @@ Other things you can check once it's complete:
     Feb 15 21:13:10 server01 passwd: pam_krb5[5795]: password changed for luxuser01@LUX.INTERNAL
     Feb 15 21:13:10 server01 sshd[5792]: pam_unix(sshd:session): session closed for user luxuser01
 
+**NOTE**:  The issues with changing the password stem from the complexity rules RHEL 5 has by default.  There are ways to mitigate this but the solutions are less than stellar.  For example, want to eliminate the "BAD PASSWORD: it is based on a dictionary word" error? 
+Well, per Red Hat,the solution is to zero out the dictionary file it uses.  That's fine until some schmuck creates a local service account and gives it a password of "password".  RHEL 5 password complexity requirements are actually more stringent than those 
+found by default in Active Directory.  I'll see if I can find the Red Hat errate on how to fix them.
+	
 conclusion
 ================
