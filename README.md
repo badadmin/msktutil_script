@@ -107,7 +107,22 @@ the ability be governed by the consumer' management of the /etc/sudoers file.  L
 * Allow Active Directory password to be changed from Linux server.
 
 *Other Stuff*
-* The krb5-ticket-renew.sh script that gets set-up monitors the state you each user' Kerberos ticket and calls kinit to refresh it periodically.  This is the same kind of behavior that goes on behind the scenes when you are logged in to a Windows server.  Simple calling kinit as *user* doesn't require a password if the user has a currently valid Kerberos ticket.  It merely tells the Active Directory domain controller that *user* is still logged in and still needs their ticket.  This good because the alternative is that *user* needs to remember to do this themselves every few hours.  When the Kerberos ticket for *user* is truly about to expire, the script will prompt *user* to re-enter their Active Directory password via kinit.  It will also delete expired Kerberos tickets.
+* The krb5-ticket-renew.sh script that gets set-up monitors the state you each user' Kerberos ticket and calls kinit to refresh it periodically.
+
+This is the same kind of behavior that goes on behind the scenes when you are logged in to a Windows server.  Simply calling kinit as *user* doesn't require a password if the user has a currently valid Kerberos ticket.  
+It merely tells the Active Directory domain controller that *user* is still logged in and still needs their ticket.  This good because the alternative is that *user* needs to remember to do this themselves every few hours.  
+When the Kerberos ticket for *user* is truly about to expire, the script will prompt *user* to re-enter their Active Directory password via kinit.  It will also delete expired Kerberos tickets.
+
+**NOTE**:  The krb5-ticket-renew.sh script can be setup to email users when they are in the final few hours of their Kerberos ticket lifetime and to automatically log users out after *X* amount of time if the user does not re-enter their password.  
+The script is not currently setup to do this.  One of two things will happen ... :
+
+* The user will be prompted to re-enter the Kerberos password if the ticket is still within it's renewable lifetime.
+* The user will be prompted to request a new Kerberos tickket if their current ticket has been deleted.
+
+... if the krb5-ticket-renew.sh script is not running, the user will get a cryptic Kerberos error message and will need to know that should then do this ... :
+
+    [badamdin@server01]$ kinit badadmin
+	Kerberos Password:
 
 todo
 ================
