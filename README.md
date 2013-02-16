@@ -164,7 +164,7 @@ The msktutil_core.conf file contains the variable settings used by msktutil_core
 
 ... the remaining values can be left at their defaults but you should, of course, review these and ensure that the settings match your requirements.
 
-My environment does not allow for direct internet access so the script does not at this time make wget options available.  You are expected to download and save the following prior to execution ... :
+My environment does not allow for direct internet access so the script does not at this time make wget options available.  You will need to download and save the following (per your architecture) prior to execution ... :
 
 * [msktutil-0.4.2-1.el5.i386.rpm - RHEL5 i386](http://dl.fedoraproject.org/pub/epel/5/i386/msktutil-0.4.2-1.el5.i386.rpm)
 * [msktutil-0.4.2-1.el5.x86_64.rpm - RHEL5 x86_64](http://dl.fedoraproject.org/pub/epel/5/x86_64/msktutil-0.4.2-1.el5.x86_64.rpm)
@@ -175,3 +175,33 @@ My environment does not allow for direct internet access so the script does not 
 ... the last one, EPEL Repository GPG Key, can be found under RPM > RHEL_5 > EPEL_REPO_KEY.  If Fedora decides tomorrow to change this then it will no longer work.
 
 The remaining RPMs will need to be download for your architecture (RHEL 5 i386 or x86_64) to RPM > RHEL_5 > i386 or RPM > RHEL_5 > x86_64.  As mentioned earlier, future verisons will support RHEL 6 and RHEL 6 clones.
+
+**NOTE**:  The script currently expects to find these exact versions of msktutil and kstart.  If you download them in the future and find that the version has changed then you will need to modify msktutil_core.sh.
+Anyone that feels like telling me how to future-proof this please do.
+
+Once you have all your files in place on server01 (or an NFS share that you are currently in); run this to convert server01 to a Kerberos-enabled member of the Active Directory domain (just what we always wanted, right?) ... :
+
+    [badadmin@server01]$ sudo su -
+	[root@server01]# cd CORE
+    [root@server01]# chmod 755 *.sh
+    [root@server01]# ./msktutil_core.sh server01
+
+... after a couple of lines, you'll be prompted for the *username* of an Active Directory account that has the ability to join a computer to the domain.  Enter *just* the username.  Not domain\username.  Not username@domain.  Just.  The.  Username.  And hit <ENTER>.
+
+Lot's of stuff flies by and it's really pretty if you have color in your terminal.  Otherwise it's just very, very verbose.  It also creates a logfile under /root/msktutil_core_install.log (or whatever you set the LOG_FILE variable to msktutil_core.conf).  
+Sorry for the amount of noise but, in troubleshooting this script, more was better.  It's a lot easier to track down where something broke if you have a log to tell you.
+
+The last bit here is that kinit **does not** accept passwords from a file.  This means that you will prompted for Active Directory user account password three times.  First, to configure the NFSV4 Service Principle Name (SPN).  
+Second, to configure the HOST Service Principle Name (SPN).  And, third, to test the ability to query LDAP from the Linux server.  After each use, the Kerberos ticket is destroyed by calling ... :
+
+    [root@server01]# kdestroy
+
+... of course, this can be changed with a little tinkering in the script.  I don't mind typing my password three times, though, since the whole process takes less then one minute (including 15 seconds of wait time coded in to allow for stuff to get done in AD).  
+
+**NOTE**:  The only way that I know to fully automate that step is to use Expect.  Which is to say, I don't know how to fully automate that part.  :)
+
+**NOTE**:  If you truly cannot live with being prompted three times and demand to only be prompted once than make sure that you note where in the script you are being prompted.  If you try to set the password at the beginning it will fail because Kerberos is 
+either not installed or not configured properly in /etc/krb5.conf.  Same thing for /etc/ldap.conf, /etc/ntp.conf, /etc/nsswitch.conf, etc., etc..  You must wait until the basic *things* are in place before you call kinit to request the Active Directory 
+password for the user account that you specified when the script first launched.
+
+In case you are wondering, it's **Step 29**.
