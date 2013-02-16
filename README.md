@@ -313,11 +313,11 @@ Verify that sudo and /etc/sudoers work (you'll need to configure /etc/sudoers to
 
     [badadmin_ldap@server01]$ id
     uid=771234567(badadmin_ldap) gid=77001(UNIXGRP) groups=77001(UNIXGRP),77002(UNIXWHEEL)
-    [badadmin_ldap@server01.lux.internal]$ sudo su -
+    [badadmin_ldap@server01]$ sudo su -
     [root@server01]# cat /etc/sudoers | grep UNIXWHEEL
     %UNIXWHEEL      ALL=(ALL)       NOPASSWD: ALL
 
-Confirm that require password change at first login work and that password change work in -general ... :
+Confirm that require password change at first login work and that password change work in-general ... :
 
     Please enter login information for 192.168.0.50.
     Username: luxuser01
@@ -356,7 +356,7 @@ Confirm that require password change at first login work and that password chang
 
     [root@server01]# tail -10 /var/log/secure | grep luxuser01
     Feb 15 21:12:38 server01 sshd[5792]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.100  user=luxuser01
-    Feb 15 21:12:38 server01 sshd[5792]: pam_krb5[5792]: authentication succeeds for 'luxuser01' (luxuser01@DCSR.SITE)
+    Feb 15 21:12:38 server01 sshd[5792]: pam_krb5[5792]: authentication succeeds for 'luxuser01' (luxuser01@LUX.INTERNAL)
     Feb 15 21:12:38 server01 sshd[5792]: pam_krb5[5792]: account checks fail for 'luxuser01': password has expired
     Feb 15 21:12:38 server01 sshd[5792]: Accepted password for luxuser01 from 192.168.0.100 port 22 ssh2
     Feb 15 21:12:38 server01 sshd[5792]: pam_unix(sshd:session): session opened for user luxuser01 by (uid=0)
