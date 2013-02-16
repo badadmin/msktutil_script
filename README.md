@@ -292,7 +292,7 @@ Verify the contents of /etc/krb5.keytab ... :
     [root@server01]# klist -ket
     Keytab name: FILE:/etc/krb5.keytab
     KVNO Timestamp         Principal
-    
+    ---- ----------------- --------------------------------------------------------    
        2 02/15/13 20:42:49 server01-nfs$@LUX.INTERNAL (ArcFour with HMAC/md5) 
        2 02/15/13 20:42:49 server01-nfs$@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
        2 02/15/13 20:42:49 server01-nfs$@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC) 
