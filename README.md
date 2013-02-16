@@ -86,8 +86,7 @@ That last one means that if I, as a Domain Administrator, run this ... :
     [badadmin@server01]$ sudo - your_account
 	[your_account@server01]$ passwd
 
-... I will still be prompted by Kerberos for your_account' original password even though I have "su -"'d to that account.  Why?  Because the Kerberos ticket I am logged in under is only good for me.  
-This is important because some solutions, like Quest Authentication Services, allow that ability.  Why?  I don't know.  Always seemed like a compromise between functionality and usabilty and Quest decided to let 
+... I will still be prompted by Kerberos for your_account' original password even though I have "su -"'d to that account.  Why?  Because the Kerberos ticket I am logged in under is only good for me. This is important because some solutions, like Quest Authentication Services, allow that ability.  Why?  I don't know.  Always seemed like a compromise between functionality and usabilty and Quest decided to let 
 the ability be governed by the consumer' management of the /etc/sudoers file.  Later version may not do allow this.  My involvement peaked at v4.
 
 *Computer Domain Membership*
