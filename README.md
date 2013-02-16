@@ -408,7 +408,7 @@ we check to see that we have a valid Kerberos ticket on **server02** (we do), an
     
     Kerberos 4 ticket cache: /tmp/tkt771234567
     klist: You have no tickets cached
-	[badadmin_ldap@vmmwsdc03app01 ~]$ exit
+	[badadmin_ldap@server02 ~]$ exit
     logout
     
 ... but now we are back on **server01**.  What does our Kerberos ticket look like now?  It has a new entry showing that badadmin_ldap on **server01** has a valid Kerberos ticket for **server01** (the ticket itself) and and entry for **server02** ... :
@@ -430,8 +430,16 @@ we check to see that we have a valid Kerberos ticket on **server02** (we do), an
     Kerberos 4 ticket cache: /tmp/tkt775002560
     klist: You have no tickets cached
 
-... that's what Kerberos is supposed to do for you.
+... that's what Kerberos is supposed to do for you.  Let's hop back over to **server02** and see what the logs say about it ... :
 
+    [badadmin_ldap@server02]$ sudo tail -25 /var/log/secure | grep badadmin_ldap
+    Feb 15 21:42:25 server02 sshd[23335]: Authorized to badadmin_ldap, krb5 principal badadmin_ldap@LUX.INTERNAL (krb5_kuserok)
+    Feb 15 21:42:25 server02 sshd[23335]: Accepted gssapi-with-mic for badadmin_ldap from 192.168.0.50 port 36885 ssh2
+    Feb 15 21:42:25 server02 sshd[23335]: pam_unix(sshd:session): session opened for user badadmin_ldap by (uid=0)
+    Feb 15 21:42:31 server02 sshd[23335]: pam_unix(sshd:session): session closed for user badadmin_ldap
+
+... that bit about [krb5_kuserok](http://web.mit.edu/kerberos/krb5-devel/doc/appdev/refs/api/krb5_kuserok.html).  Per MIT and Heimdal, to be sure, krb5_kuserok is basically saying badadmin_ldap already has a valid principle and can, therefore, login.  
+	
 changes to your local user account
 ================
 
@@ -442,3 +450,7 @@ You will want to add this to your local account' .bash_profile.  This is what al
 
 conclusion
 ================
+What haven't I covered here?  AutoFS.  I'm still working on getting NFSv4 sorted out properly *and* getting NFSv4 AutoFS automount maps to work when presented from Active Directory.  NFSv3 and NFSv4 without Kerberos work fine; I just haven't 
+had time to play with NFSv4 with Kerberos.  The point in telling you this?  You can probably get rid of the NFSv4 stuff from the script since I've no idea when I'll get it functional.
+
+Again, please let me know how I can make this better.  As you can tell, I'm not the world' most accomplished wielder of bash.  Or NFSv4 with Kerberos :)
