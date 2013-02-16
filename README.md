@@ -15,7 +15,7 @@ disclaimer
 
 These scripts will fundamentally change the behavior of your server, or, at least it will attempt to.  Please do not run this against a production server 
 or any server that you care about until you have completely tested and vetted the results against your requirements and the outcome arrived at.  The main 
-msktutil_core.sh script will make backup copies of all the impacted files prior to chnaging them.  It does not, however, provide the means to roll-back the 
+msktutil_core.sh script will make backup copies of all the impacted files prior to changing them.  It does not, however, provide the means to roll-back the 
 changes made by the authconfig command.
 
 Finally, if this scripts causes you untold amounts of financial loss, the dissolution of your marriage, your dog to die, your server to explode, your 
