@@ -218,3 +218,152 @@ either not installed or not configured properly in /etc/krb5.conf.  Same thing f
 password for the user account that you specified when the script first launched.
 
 In case you are wondering, it's **Step 29**.
+
+issues
+================
+
+If you see **Step 35** [FAIL] when trying to start the service kstart_ldap ... :
+
+    >>> STEP 35 - 20:40:24-EST - BEGIN START AND CONFIGURE K5START_LDAP SERVICE
+    [PASS] ... the k5start_ldap service is stopped...starting the service.
+    Starting k5start_ldap: k5start: error getting credentials: Client not found in Kerberos database
+                                                               [FAILED]
+    [INFO] ... the k5start_ldap service is configured for run-levels:
+    k5start_ldap 0:off 1:off 2:on 3:on 4:on 5:on 6:off
+
+... don't panic.  I'm not sure why this happens but it does from time to time.  If anyone can suggest a solution IO would be grateful.  Regardless, the solution is easy.  By that point in the script it's not really needed for anything other than the 
+Active Directory LDAP query at **Step 37**.  That step will fail, too.  Just start the service and run the query manually ... :
+
+    [root@sever01]# service k5start_ldap status
+    k5start is stopped
+    [root@vmaaron5 CORE_SCRIPTS]# service k5start_ldap start
+    Starting k5start_ldap:                                     [  OK  ]
+
+... now, make sure that k5start_ldap did what it was supposed to do (get a HOST kerberos ticket) ... :
+
+    [root@server01]# klist -cef /etc/.ldapcache 
+    Ticket cache: FILE:/etc/.ldapcache
+    Default principal: server01$@LUX.INTERNAL
+    
+    Valid starting     Expires            Service principal
+    02/15/13 20:43:43  02/16/13 06:43:43  krbtgt/LUX.INTERNAL@LUX.INTERNAL
+            renew until 02/22/13 20:43:43, Flags: FRIA
+            Etype (skey, tkt): ArcFour with HMAC/md5, ArcFour with HMAC/md5 
+    02/15/13 20:43:43  02/16/13 06:43:43  ldap/server01.lux.internal@LUX.INTERNAL
+            renew until 02/22/13 20:43:43, Flags: FRAO
+            Etype (skey, tkt): AES-256 CTS mode with 96-bit SHA-1 HMAC, AES-256 CTS mode with 96-bit SHA-1 HMAC
+
+... now, try to query Active Directory LDAP again.  First, kinit with your Active Directory user account and provide the password when prompted... :
+
+    [root@server01]# kinit badadmin_ldap
+	Password for badadmin_ldap@LUX.INTERNAL:
+
+... now, root has been granted a Kerberos ticket for badadmin_ldap ... :
+
+    [root@server01]# klist -cef
+    Ticket cache: FILE:/tmp/krb5cc_0
+    Default principal: badadmin_ldap@LUX.INTERNAL
+    
+    Valid starting     Expires            Service principal
+    02/15/13 20:51:44  02/16/13 06:51:44  krbtgt/LUX.INTERNAL@LUX.INTERNAL
+            renew until 02/22/13 20:51:44, Flags: FRIA
+            Etype (skey, tkt): ArcFour with HMAC/md5, ArcFour with HMAC/md5 
+    
+    
+    Kerberos 4 ticket cache: /tmp/tkt0
+    klist: You have no tickets cached
+
+... now, root can query LDAP Active Directory using the credentials provided by badadmin_ldap ... :
+
+    [root@server01]# /usr/bin/getent passwd luxuser01
+    luxuser01:*:770000001:77001:LUX.INTERNAL LUXUSER01 TEST ACCOUNT:/home/luxuser01:/bin/bash
+    [root@server01]# /usr/bin/ldapsearch cn=luxuser01 2>&1 | grep ^employeeID               
+    employeeID: TEST_ACCT
+
+... in this example, we have a test account called "luxuser01" setup in Active Directory.  As you see, both the getent and ldapsearch command worked.  Some notes worth mentioning ... :
+
+* The getent command expects that the HOST has a Kerberos ticket.  In other words, when k5start_ldap failed to start earlier, the HOST could not see passwd beyond the local /etc/passwd file even though /etc/nsswitch is configured to search both locally and LDAP.
+* The ldapsearch command, hwoever, **does** expect that user running has a Kerberos ticket that grants it the ability to query Active Directory.  In other words, unless root has a Kerberos ticket (by kinit'ng as an Active Directory user), then root will **not** be able to successfully run ldapsearcg even though the HOST has a valid Kerberos ticket.
+
+Other things you can check once it's complete:
+
+* /etc/krb5.keytab
+
+    [root@server01]# klist -ket
+    Keytab name: FILE:/etc/krb5.keytab
+    KVNO Timestamp         Principal
+    ---- ----------------- --------------------------------------------------------
+       2 02/15/13 20:42:49 server01-nfs$@LUX.INTERNAL (ArcFour with HMAC/md5) 
+       2 02/15/13 20:42:49 server01-nfs$@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:42:49 server01-nfs$@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:42:49 nfs/server01.lux.internal@LUX.INTERNAL (ArcFour with HMAC/md5) 
+       2 02/15/13 20:42:49 nfs/server01.lux.internal@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:42:49 nfs/server01.lux.internal@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:43:14 server01$@LUX.INTERNAL (ArcFour with HMAC/md5) 
+       2 02/15/13 20:43:14 server01$@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:43:14 server01$@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:43:14 host/server01.lux.internal@LUX.INTERNAL (ArcFour with HMAC/md5) 
+       2 02/15/13 20:43:14 host/server01.lux.internal@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:43:14 host/server01.lux.internal@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:43:14 host/server01@LUX.INTERNAL (ArcFour with HMAC/md5) 
+       2 02/15/13 20:43:14 host/server01@LUX.INTERNAL (AES-128 CTS mode with 96-bit SHA-1 HMAC) 
+       2 02/15/13 20:43:14 host/server01@LUX.INTERNAL (AES-256 CTS mode with 96-bit SHA-1 HMAC)
+
+* sudo
+
+    [badadmin_ldap@server01]$ id
+    uid=771234567(badadmin_ldap) gid=77001(UNIXGRP) groups=77001(UNIXGRP),77002(UNIXWHEEL)
+    [badadmin_ldap@server01.lux.internal]$ sudo su -
+    [root@server01]# cat /etc/sudoers | grep UNIXWHEEL
+    %UNIXWHEEL      ALL=(ALL)       NOPASSWD: ALL
+
+* password reset
+
+    Please enter login information for 192.168.0.50.
+    Username: luxuser01
+    Password: 
+    Warning: password has expired.
+    Last login: Fri Feb 15 12:40:28 2013 from 10.48.163.205
+    *******************************************************************************
+    *******************************************************************************
+    **                                                                           **
+    ** SECURITY NOTICE:                                                          **
+    **                                                                           **
+    ** Only authorized users may use this system for legitimate business         **
+    ** purposes. There is no expectation of privacy in connection with your      **
+    ** activities or the information handled, sent, or stored on this network.   **
+    ** By accessing this system you accept that your actions on this network may **
+    ** be monitored and/or recorded.  Information gathered may be used to pursue **
+    ** any and all remedies available by law, including termination of           **
+    ** employment or the providing of the evidence of such monitoring to law     **
+    ** enforcement officials.                                                    **
+    **                                                                           **
+    *******************************************************************************
+    *******************************************************************************
+    WARNING: Your password has expired.
+    You must change your password now and login again!
+    Changing password for user luxuser01.
+    Kerberos 5 Password: 
+    New password: 
+    BAD PASSWORD: is too similar to the old one
+    New password: 
+    BAD PASSWORD: it is based on a dictionary word
+    New password: 
+    Retype new password: 
+    passwd: all authentication tokens updated successfully.
+
+... and check logs ... :
+
+    [root@server01]# tail -10 /var/log/secure | grep luxuser01
+    Feb 15 21:12:38 server01 sshd[5792]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.100  user=luxuser01
+    Feb 15 21:12:38 server01 sshd[5792]: pam_krb5[5792]: authentication succeeds for 'luxuser01' (luxuser01@DCSR.SITE)
+    Feb 15 21:12:38 server01 sshd[5792]: pam_krb5[5792]: account checks fail for 'luxuser01': password has expired
+    Feb 15 21:12:38 server01 sshd[5792]: Accepted password for luxuser01 from 192.168.0.100 port 22 ssh2
+    Feb 15 21:12:38 server01 sshd[5792]: pam_unix(sshd:session): session opened for user luxuser01 by (uid=0)
+    Feb 15 21:12:38 server01 passwd: pam_unix(passwd:chauthtok): user "luxuser01" does not exist in /etc/passwd
+    Feb 15 21:13:10 server01 passwd: pam_unix(passwd:chauthtok): user "luxuser01" does not exist in /etc/passwd
+    Feb 15 21:13:10 server01 passwd: pam_krb5[5795]: password changed for luxuser01@LUX.INTERNAL
+    Feb 15 21:13:10 server01 sshd[5792]: pam_unix(sshd:session): session closed for user luxuser01
+
+conclusion
+================
