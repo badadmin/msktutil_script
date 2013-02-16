@@ -119,7 +119,7 @@ is not currently setup to do this.  One of two things will happen ... :
 * The user will be prompted to re-enter the Kerberos password if the ticket is still within it's renewable lifetime.
 * The user will be prompted to request a new Kerberos tickket if their current ticket has been deleted.
 
-... if the krb5-ticket-renew.sh script is not running, the user will get a cryptic Kerberos error message and will need to know that should then do this ... :
+... if the krb5-ticket-renew.sh script is not running, the user will get a cryptic Kerberos error message and will need to know that they should then do this to update their Kerberos ticket ... :
 
     [badamdin@server01]$ kinit badadmin
 	Kerberos Password:
