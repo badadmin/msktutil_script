@@ -187,6 +187,19 @@ Once you have all your files in place on server01 (or an NFS share that you are 
     [root@server01]# ./msktutil_core.sh server01
 
 ... after a couple of lines, you'll be prompted for the *username* of an Active Directory account that has the ability to join a computer to the domain.  Enter *just* the username.  Not domain\username.  Not username@domain.  Just.  The.  Username.  And hit <ENTER>.
+It'll look like this:
+
+    <<< BEGIN MSKTUTIL_CORE INSTALL >>>
+    [INFO] ... INSTALL START TIME: 20:40:24-EST
+    
+    ##################################################
+    #                                                #
+    #     WELCOME TO THE MSKTUTIL_CORE INSTALL!      #
+    #                                                #
+    ##################################################
+    
+    [INFO] ... an active directory user account with the rights to join a computer object to the domain must be provided.
+    [INFO] ... please enter your active directory username only (not username@domain or domain\username): 
 
 Lot's of stuff flies by and it's really pretty if you have color in your terminal.  Otherwise it's just very, very verbose.  It also creates a logfile under /root/msktutil_core_install.log (or whatever you set the LOG_FILE variable to msktutil_core.conf).  
 Sorry for the amount of noise but, in troubleshooting this script, more was better.  It's a lot easier to track down where something broke if you have a log to tell you.
