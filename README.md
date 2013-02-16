@@ -132,8 +132,9 @@ todo
 * Break script up to be more modular and add some menu functionality.
 * Add a restore process to revert as many changes as possible to allow roll-back.
 * Add Postfix or Sendmail configuration to allow emailed results and alerts.
+* Add option for local file deliver, NFS file delivery, and wget file delivery at run time or by answer file.
 
-Please let me know how I can improve this.
+Please let me know how I can improve script.
 
 running msktutil_core
 ================
@@ -164,3 +165,12 @@ The msktutil_core.conf file contains the variable settings used by msktutil_core
 
 ... the remaining values can be left at their defaults but you should, of course, review these and ensure that the settings match your requirements.
 
+My environment does not allow for direct internet access so the script does not at this time make wget options available.  You are expected to download and save the following prior to execution ... :
+
+* [msktutil-0.4.2-1.el5.i386.rpm - RHEL5 i386](http://dl.fedoraproject.org/pub/epel/5/i386/msktutil-0.4.2-1.el5.i386.rpm)
+* [msktutil-0.4.2-1.el5.x86_64.rpm - RHEL5 x86_64](http://dl.fedoraproject.org/pub/epel/5/x86_64/msktutil-0.4.2-1.el5.x86_64.rpm)
+* [kstart-4.1-2.el5.i386.rpm - RHEL5 i386](http://dl.fedoraproject.org/pub/epel/5/i386/kstart-4.1-2.el5.i386.rpm)
+* [kstart-4.1-2.el5.x86_64.rpm - RHEL5 x86_64](http://dl.fedoraproject.org/pub/epel/5/x86_64/kstart-4.1-2.el5.x86_64.rpm)
+* [Fedora EPEL Repository GPG Key - RPM-GPG-KEY-EPEL](https://fedoraproject.org/static/217521F6.txt) - Right-click, save 217521F6.txt to your server.
+
+... the last one, EPEL Repository GPG Key, can be found under RPM > RHEL_5 > EPEL_REPO_KEY.  If Fedora decides tomorrow to change this then it will no longer work.
