@@ -367,7 +367,7 @@ Confirm that require password change at first login work and that password chang
 
 **NOTE**:  The issues with changing the password stem from the complexity rules RHEL 5 has by default.  There are ways to mitigate this but the solutions are less than stellar.  For example, want to eliminate the "BAD PASSWORD: it is based on a dictionary word" error? 
 Well, per Red Hat,the solution is to zero out the dictionary file it uses.  That's fine until some schmuck creates a local service account and gives it a password of "password".  RHEL 5 password complexity requirements are actually more stringent than those 
-found by default in Active Directory.  I'll see if I can find the Red Hat errate on how to fix them.
+found by default in Active Directory.  I'll see if I can find the Red Hat errata on how to fix them.
 
 ... verify that Kerberos works like it is supposed to work!  Once you have two servers set up in this manner, authenticate to one via SSH and then, from the server, SSH to the other.  You should not be prompted for a password.  
 Let's see how it works ... :
