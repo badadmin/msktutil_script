@@ -443,7 +443,7 @@ we check to see that we have a valid Kerberos ticket on **server02** (we do), an
 changes to your local user account
 ================
 
-You will want to add this to your local account' .bash_profile.  This is what allows you to be prompted by kinit when you need to enter your Active Directory password.  Otherwise, you simple get a Kerberos error and need to *know* to type "kinit badadmin_ldap" ... :
+You will want to add this to your local account' .bash_profile.  This is what allows you to be prompted by kinit when you need to enter your Active Directory password.  Otherwise, you'll get a Kerberos error and need to *know* to type "kinit badadmin_ldap" ... :
 
     # Ask k5start to check for a happy (-H) Kerberos ticket
     export PROMPT_COMMAND="k5start -H 360"
