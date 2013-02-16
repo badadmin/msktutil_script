@@ -113,8 +113,8 @@ This is the same kind of behavior that goes on behind the scenes when you are lo
 controller that *user* is still logged in and still needs their ticket.  This good because the alternative is that *user* needs to remember to do this themselves every few hours.  When the Kerberos ticket for *user* is truly about to expire, the script will 
 prompt *user* to re-enter their Active Directory password via kinit.  It will also delete expired Kerberos tickets.
 
-**NOTE**:  The krb5-ticket-renew.sh script can be setup to email users when they are in the final few hours of their Kerberos ticket lifetime and to automatically log users out after *X* amount of time if the user does not re-enter their password.  
-The script is not currently setup to do this.  One of two things will happen ... :
+**NOTE**:  The krb5-ticket-renew.sh script can be setup to email users when they are in the final few hours of their Kerberos ticket lifetime and to automatically log users out after *X* amount of time if the user does not re-enter their password.  The script 
+is not currently setup to do this.  One of two things will happen ... :
 
 * The user will be prompted to re-enter the Kerberos password if the ticket is still within it's renewable lifetime.
 * The user will be prompted to request a new Kerberos tickket if their current ticket has been deleted.
