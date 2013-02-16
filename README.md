@@ -102,6 +102,19 @@ Again, a good place to start if you are unfamiliar.
 goals
 ================
 
+*Security*
+* No bind user or bind user password required to present in any Linux file!
+* No UID\GID randomness.  What is assigned in Active Directory is what is used on the Linux server.
+* Nested LDAP Groups.  I am a member of one group ... and the twenty other nested beneath it.  This is good for sudo purposes and a stupid difficult problem in Samba.
+* **NO ONE** can change an Active Directory user password from the Linux server without knowing the original password.
+
+That last one means that if I, as a Domain Administrator, run this ... :
+
+    [badadmin@server01]$ sudo - your_account
+	[your_account@server01]$ passwd
+
+... I will still be prompted by Kerberos for your_account' original password even though I have "su -"'d to that account.  Why?  Because the Kerberos ticket I am logged in under is only good for me.  This is important because some solutions, like Quest Authentication Services, allow that ability.
+
 *Computer Domain Membership*
 * Join RHEL 5 server (or RHEL 5 clone) to Active Directory domain from the command-line of the Linux server.
 * Auto-acquire and populate Kerberos key from Active Directory and from the command-line of the Linux server.
@@ -110,13 +123,14 @@ goals
 *Authentication to LDAP*
 * Console Login
 * SSH\SFTP Login
-* HTTP\FTP Login (not implemented yet)
+* HTTP\FTP Login (not implemented yet ... waiting for update to msktutil to better supprt service accounts)
 
 *Authorized Password Changes*
-* Force user to change their passowrd at their initial login or after a password has been reset in Active Directory.
+* Force user to change their password at their initial login or after a password has been reset in Active Directory.
 * Notify user when their password is approaching expiry or has already expired.
 * Honor password policies as set in Active Directory GPO password policies (some of these work, like number of days before user can change password again.  Others, like the password complexity requirements get hung-up on RHEL' password complexity rules and need to be disabled locally to be circumvented).
 * Account lock-out per Active Directory policy (lock-out on LDAP server; locked out on domain).
+* Allow Active Directory password to be changed from Linux server.
 
 running msktutil_core
 ================
