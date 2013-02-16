@@ -285,7 +285,8 @@ Active Directory LDAP query at **Step 37**.  That step will fail, too.  Just sta
 * The getent command expects that the HOST has a Kerberos ticket.  In other words, when k5start_ldap failed to start earlier, the HOST could not see passwd beyond the local /etc/passwd file even though /etc/nsswitch is configured to search both locally and LDAP.
 * The ldapsearch command, hwoever, **does** expect that user running has a Kerberos ticket that grants it the ability to query Active Directory.  In other words, unless root has a Kerberos ticket (by kinit'ng as an Active Directory user), then root will **not** be able to successfully run ldapsearcg even though the HOST has a valid Kerberos ticket.
 
-Other things you can check once it's complete ... :
+checking your work
+================
 
 Verify the contents of /etc/krb5.keytab ... :
 
@@ -448,6 +449,18 @@ You will want to add this to your local account' .bash_profile.  This is what al
     # Ask k5start to check for a happy (-H) Kerberos ticket
     export PROMPT_COMMAND="k5start -H 360"
 
+starting over
+================
+
+If you need to run the script again on the same server, I usually do the following ... :
+
+* delete computer object for the HOST and the NFSv4 SPN (by script defaults, under LUX.INTERNAL > LUX > HOSTS and LUX.INTERNAL > LUX > HOSTS > SERVICES).
+* stop the k5start_ldap service (# service k5start_ldap stop)
+* delete the HOST Kerberos cache (# rm /etc/.ldapcache)
+* delete the HOST Kerberos keytab file (# rm /etc/krb5.keytab)
+
+... once complete, you should be able to run the script again wihtout issue.
+	
 conclusion
 ================
 What haven't I covered here?  AutoFS.  I'm still working on getting NFSv4 sorted out properly *and* getting NFSv4 AutoFS automount maps to work when presented from Active Directory.  NFSv3 and NFSv4 without Kerberos work fine; I just haven't 
