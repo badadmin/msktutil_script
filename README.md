@@ -222,7 +222,7 @@ In case you are wondering, it's **Step 29**.
 issues
 ================
 
-If you see **Step 35** [FAIL] when trying to start the service kstart_ldap ... :
+If you see **Step 35** [FAILED] when trying to start the service kstart_ldap ... :
 
     >>> STEP 35 - 20:40:24-EST - BEGIN START AND CONFIGURE K5START_LDAP SERVICE
     [PASS] ... the k5start_ldap service is stopped...starting the service.
@@ -234,9 +234,9 @@ If you see **Step 35** [FAIL] when trying to start the service kstart_ldap ... :
 ... don't panic.  I'm not sure why this happens but it does from time to time.  If anyone can suggest a solution IO would be grateful.  Regardless, the solution is easy.  By that point in the script it's not really needed for anything other than the 
 Active Directory LDAP query at **Step 37**.  That step will fail, too.  Just start the service and run the query manually ... :
 
-    [root@sever01]# service k5start_ldap status
+    [root@server01]# service k5start_ldap status
     k5start is stopped
-    [root@vmaaron5 CORE_SCRIPTS]# service k5start_ldap start
+    [root@server01]# service k5start_ldap start
     Starting k5start_ldap:                                     [  OK  ]
 
 ... now, make sure that k5start_ldap did what it was supposed to do (get a HOST kerberos ticket) ... :
