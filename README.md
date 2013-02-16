@@ -81,14 +81,35 @@ goals
 * LDAP groups are seen by sudoers.
 * **NO ONE** can change an Active Directory user password from the Linux server without knowing the original password.
 
-That last one means that if I, as a Domain Administrator, run this ... :
+That last one means that if I, using my Active Directory Domain Administrator account (badadmin_ldap), run this ... :
 
-    [badadmin@server01]$ sudo - your_account
-	[your_account@server01]$ passwd
+    [badadmin_ldap@server01]$ passwd luxuser01
+	passwd: Only root can specify a user name.
+    Password for luxuser01@LUX.INTERNAL: 
 
-... I will still be prompted by Kerberos for your_account' original password even though I have "su -"'d to that account.  Why?  Because the Kerberos ticket I am logged in under is only good for me. This is important because some solutions, like Quest Authentication Services, allow that ability.  Why?  I don't know.  Always seemed like a compromise between functionality and usabilty and Quest decided to let 
+... I will still be prompted by Kerberos for your_account' original password.  Why?  Because the Kerberos ticket I am logged in under is only good for me. This will occur if root attempts to do this.  This is important because some solutions, like Quest Authentication Services, allow that ability.  Why?  I don't know.  Always seemed like a compromise between functionality and usabilty and Quest decided to let 
 the ability be governed by the consumer' management of the /etc/sudoers file.  Later version may not do allow this.  My involvement peaked at v4.
 
+Additionally, attempting to su to another account has differences as well.  Below, I login as badadmin_ldap and receive a Kerberos ticket from Active Directory.  I then su to user luxuser01 (as allowed with no password per the /etc/sudoers file).  Next, I 
+try to change the password for for user luxuser01 as luxuser01 and I am prompted for luxuser01' existing Kerberos 5 password ... :
+
+    [badadmin_ldap@server01]$ whoami         
+    badadmin_ldap
+    [badadmin_ldap@server01]$ sudo su luxuser01
+    [luxuser01@server01]$ whoami
+    luxuser01
+    [luxuser01@server01]$ passwd
+    Changing password for user luxuser01.
+    Kerberos 5 Password: 
+    passwd: Authentication token manipulation error
+
+... additionally, if I try to su with the users environment I am immediately prompted for their Kerberos 5 password ... :
+
+    [badadmin_ldap@server01$ sudo su - luxuser01
+    Password for luxuser01@LUX.INTERNAL: 
+
+... these results are the same if the root user (instead of badadmin_ldap) attempts this.
+	
 *Computer Domain Membership*
 * Join RHEL 5 server (or RHEL 5 clone) to Active Directory domain from the command-line of the Linux server.
 * Auto-acquire and populate Kerberos key from Active Directory and from the command-line of the Linux server.
