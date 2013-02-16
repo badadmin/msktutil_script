@@ -368,6 +368,77 @@ Confirm that require password change at first login work and that password chang
 **NOTE**:  The issues with changing the password stem from the complexity rules RHEL 5 has by default.  There are ways to mitigate this but the solutions are less than stellar.  For example, want to eliminate the "BAD PASSWORD: it is based on a dictionary word" error? 
 Well, per Red Hat,the solution is to zero out the dictionary file it uses.  That's fine until some schmuck creates a local service account and gives it a password of "password".  RHEL 5 password complexity requirements are actually more stringent than those 
 found by default in Active Directory.  I'll see if I can find the Red Hat errate on how to fix them.
+
+... verify that Kerberos works like it is supposed to work!  Once you have two servers set up in this manner, authenticate to one via SSH and then, from the server, SSH to the other.  You should not be prompted for a password.  
+Let's see how it works ... :
+
+... we're on **server01** and we check the hostname, our Kerberos ticket, and then ssh to **server02** ... :
+
+    [badadmin_ldap@server01]$ hostname
+    server01.lux.internal
+    [badadmin_ldap@server01]$ klist -cef
+    Ticket cache: FILE:/tmp/krb5cc_771234567_yJRWKu5812
+    Default principal: badadmin_ldap@LUX.INTERNAL
+    
+    Valid starting     Expires            Service principal
+    02/15/13 21:31:09  02/16/13 07:31:09  krbtgt/LUX.INTERNAL@LUX.INTERNAL
+            renew until 02/22/13 21:31:09, Flags: FRIA
+            Etype (skey, tkt): ArcFour with HMAC/md5, ArcFour with HMAC/md5 
+        
+        
+    Kerberos 4 ticket cache: /tmp/tkt771234567
+    klist: You have no tickets cached
+    badadmin_ldap@server01.lux.internal:[/export/home/badadmin_ldap]$ ssh server02
 	
+... now we're on **server02** and we we not prompted for a password.  This is how Kerberos is supposed to work.  You already have a valid ticket from the Domain Controller.  When you SSH'd from **server01** to **server02**, GSSAPI on **server02** saw that 
+and passed that back to the Domain Controller which then, rightfully, said, "badadmin_ldap already gave me his password earlier so here's a new ticket for him to use on **server02**".  We check the hostname to confirm that we're on **server02** (we are), 
+we check to see that we have a valid Kerberos ticket on **server02** (we do), and then we end the SSH session (exit) ... :
+	
+    [badadmin_ldap@server02 ~]$ hostname
+    server02.lux.internal
+    [badadmin_ldap@server02 ~]$ klist -cef
+    Ticket cache: FILE:/tmp/krb5cc_771234567_lUwvz23281
+    Default principal: badadmin_ldap@LUX.INTERNAL
+    
+    Valid starting     Expires            Service principal
+    02/15/13 21:37:10  02/16/13 07:31:09  krbtgt/LUX.INTERNAL@LUX.INTERNAL
+            renew until 02/22/13 21:31:09, Flags: FfRA
+            Etype (skey, tkt): ArcFour with HMAC/md5, ArcFour with HMAC/md5 
+    
+    
+    Kerberos 4 ticket cache: /tmp/tkt771234567
+    klist: You have no tickets cached
+	[badadmin_ldap@vmmwsdc03app01 ~]$ exit
+    logout
+    
+... but now we are back on **server01**.  What does our Kerberos ticket look like now?  It has a new entry showing that badadmin_ldap on **server01** has a valid Kerberos ticket for **server01** (the ticket itself) and and entry for **server02** ... :
+	
+    Connection to server02 closed.
+    badadmin_ldap@vmaaron5.lux.internal:[/export/home/badadmin_ldap]$ klist -cef
+    Ticket cache: FILE:/tmp/krb5cc_771234567_yJRWKu5812
+    Default principal: badadmin_ldap@LUX.INTERNAL
+    
+    Valid starting     Expires            Service principal
+    02/15/13 21:41:39  02/16/13 07:41:39  krbtgt/LUX.INTERNAL@LUX.INTERNAL
+            renew until 02/22/13 21:41:39, Flags: FRIA
+            Etype (skey, tkt): ArcFour with HMAC/md5, ArcFour with HMAC/md5 
+    02/15/13 21:42:25  02/16/13 07:41:39  host/server02.lux.internal@LUX.INTERNAL
+            renew until 02/22/13 21:41:39, Flags: FRAO
+            Etype (skey, tkt): AES-256 CTS mode with 96-bit SHA-1 HMAC, AES-256 CTS mode with 96-bit SHA-1 HMAC 
+    
+    
+    Kerberos 4 ticket cache: /tmp/tkt775002560
+    klist: You have no tickets cached
+
+... that's what Kerberos is supposed to do for you.
+
+changes to your local user account
+================
+
+You will want to add this to your local account' .bash_profile.  This is what allows you to be prompted by kinit when you need to enter your Active Directory password.  Otherwise, you simple get a Kerberos error and need to *know* to type "kinit badadmin_ldap" ... :
+
+    # Ask k5start to check for a happy (-H) Kerberos ticket
+    export PROMPT_COMMAND="k5start -H 360"
+
 conclusion
 ================
